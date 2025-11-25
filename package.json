@@ -15,6 +15,7 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.84.0",
     "@tailwindcss/vite": "^4.1.17",
+    "qr-scanner": "^1.4.2",
     "qrcode": "^1.5.4",
     "vue": "^3.5.22",
     "vue-router": "^4.6.3"
