@@ -71,6 +71,11 @@ const routes = [
     component: EventScanner,
     meta: { requiresAuth: true, role: "ranger" },
   },
+  // Add catch-all route for 404 handling
+  {
+    path: "/:pathMatch(.*)*",
+    redirect: "/login",
+  },
 ];
 
 const router = createRouter({
@@ -78,22 +83,58 @@ const router = createRouter({
   routes,
 });
 
-// Simplified navigation guard - no async in the guard itself
-router.beforeEach((to, from, next) => {
+// Enhanced navigation guard with proper auth handling
+router.beforeEach(async (to, from, next) => {
   console.log(`[Router] Navigation: ${from.path} -> ${to.path}`);
 
-  // Just allow navigation - we'll handle auth in components
-  next();
-});
+  try {
+    // Get current session
+    const {
+      data: { session },
+      error,
+    } = await supabase.auth.getSession();
 
-// Error handler
-router.onError((error) => {
-  console.error("[Router] Error:", error);
-});
+    if (error) {
+      console.error("Auth session error:", error);
+      next("/login");
+      return;
+    }
 
-// Success handler
-router.afterEach((to, from) => {
-  console.log(`[Router] Completed: ${to.path}`);
+    const requiresAuth = to.meta.requiresAuth;
+    const isAuthPage = to.path === "/login";
+
+    // If route requires authentication but no session exists
+    if (requiresAuth && !session) {
+      console.log("[Router] Auth required but no session, redirecting to login");
+      next("/login");
+      return;
+    }
+
+    // If user is already authenticated and tries to access login page
+    if (isAuthPage && session) {
+      console.log("[Router] Session exists, redirecting from login to dashboard");
+      next("/dashboard");
+      return;
+    }
+
+    // If route requires specific role
+    if (to.meta.role && session) {
+      const userRole = session.user?.user_metadata?.role;
+      console.log("[Router] User role:", userRole, "Required role:", to.meta.role);
+
+      if (userRole !== to.meta.role) {
+        console.log("[Router] Role mismatch, redirecting to dashboard");
+        next("/dashboard");
+        return;
+      }
+    }
+
+    // Allow navigation
+    next();
+  } catch (error) {
+    console.error("[Router] Navigation error:", error);
+    next("/login");
+  }
 });
 
 export default router;
