@@ -3,8 +3,10 @@
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8">
       <!-- Header -->
       <div class="text-center mb-8">
-        <div class="text-5xl mb-3">🌊</div>
-        <h1 class="text-3xl font-bold text-gray-800">Panaraga Pulse</h1>
+         <img src="@/assets/logo.png" alt="Loading Icon" class="w-24 h-24 mx-auto mb-0" />
+          <h1 class="text-xl font-bold" style="color: #0A3A47;">
+          Panaraga <span style="color: #3CB371;">Pulse</span>
+         </h1>
         <p class="text-gray-500 mt-2">Protect our ocean's treasures</p>
       </div>
 
@@ -31,16 +33,28 @@
           />
         </div>
 
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
-          <input
-            v-model="password"
-            type="password"
-            required
-            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent outline-none"
-            placeholder="••••••••"
-          />
-        </div>
+       <div class="relative">
+        <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+
+        <input
+          v-model="password"
+          :type="showPassword ? 'text' : 'password'"
+          required
+          class="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg 
+                focus:ring-2 focus:ring-cyan-500 focus:border-transparent outline-none"
+          placeholder="••••••••"
+        />
+
+        <!-- Toggle Button -->
+        <button
+          type="button"
+          @click="showPassword = !showPassword"
+          class="absolute right-3 top-14 -translate-y-1/2 text-gray-500 hover:text-cyan-600"
+        >
+          <EyeSlashIcon v-if="showPassword" class="w-5 h-5" />
+          <EyeIcon v-else class="w-5 h-5" />
+        </button>
+      </div>
 
         <button
           type="submit"
@@ -75,17 +89,28 @@
           />
         </div>
 
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
-          <input
-            v-model="password"
-            type="password"
-            required
-            minlength="6"
-            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent outline-none"
-            placeholder="••••••••"
-          />
-        </div>
+        <div class="relative">
+        <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+
+        <input
+          v-model="password"
+          :type="showPassword ? 'text' : 'password'"
+          required
+          class="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg 
+                focus:ring-2 focus:ring-cyan-500 focus:border-transparent outline-none"
+          placeholder="••••••••"
+        />
+
+        <!-- Toggle Button -->
+        <button
+          type="button"
+          @click="showPassword = !showPassword"
+          class="absolute right-3 top-14 -translate-y-1/2 text-gray-500 hover:text-cyan-600"
+        >
+          <EyeSlashIcon v-if="showPassword" class="w-5 h-5" />
+          <EyeIcon v-else class="w-5 h-5" />
+        </button>
+      </div>
 
         <button
           type="submit"
@@ -100,16 +125,16 @@
       <div class="mt-6 text-center">
   <button
     @click="toggleForm"
-    class="text-cyan-600 hover:text-cyan-700 font-medium"
+    class="text-dark-600 hover:text-cyan-700 font-medium"
   >
     <template v-if="showRegister">
       Already have an account?
-      <span class="underline">Login</span>
+      <span class="underline text-cyan-600">Login</span>
     </template>
 
     <template v-else>
       Don't have an account?
-      <span class="underline">Register</span>
+      <span class="underline text-cyan-600">Register</span>
     </template>
   </button>
 </div>
@@ -122,6 +147,7 @@
 import { ref } from 'vue';
 import { supabase } from '@/js/supabase';
 import { useRouter } from 'vue-router';
+import { EyeIcon, EyeSlashIcon } from "@heroicons/vue/24/outline"
 
 const router = useRouter();
 const email = ref('');
@@ -131,6 +157,9 @@ const loading = ref(false);
 const error = ref('');
 const success = ref('');
 const showRegister = ref(false);
+const showPassword = ref(false)
+
+
 
 const toggleForm = () => {
   showRegister.value = !showRegister.value;

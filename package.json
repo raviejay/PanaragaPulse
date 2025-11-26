@@ -13,6 +13,7 @@
     "lint": "eslint . --fix --cache"
   },
   "dependencies": {
+    "@heroicons/vue": "^2.2.0",
     "@supabase/supabase-js": "^2.84.0",
     "@tailwindcss/vite": "^4.1.17",
     "qr-scanner": "^1.4.2",
