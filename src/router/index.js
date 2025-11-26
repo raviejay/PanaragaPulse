@@ -71,11 +71,6 @@ const routes = [
     component: EventScanner,
     meta: { requiresAuth: true, role: "ranger" },
   },
-  // Add catch-all route for 404 handling
-  {
-    path: "/:pathMatch(.*)*",
-    redirect: "/login"
-  }
 ];
 
 const router = createRouter({
@@ -83,6 +78,7 @@ const router = createRouter({
   routes,
 });
 
+// Simplified navigation guard - no async in the guard itself
 router.beforeEach((to, from, next) => {
   console.log(`[Router] Navigation: ${from.path} -> ${to.path}`);
 
