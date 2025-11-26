@@ -14,7 +14,6 @@ const router = useRouter();
     <!-- Welcome Card -->
     <div class="bg-gradient-to-r from-cyan-500 to-teal-500 rounded-2xl p-8 text-white mb-8 whitespace-nowrap">
       <h2 class="text-3xl font-bold mb-2">Welcome back, {{ userProfile?.name }}! 👋</h2>
-      <!-- <p class="text-cyan-100 mb-4">You're logged in as a {{ userProfile?.role }}</p> -->
       <div class="flex items-center space-x-6">
         <div class="bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2">
           <p class="text-sm text-cyan-100">Eco Points</p>
@@ -34,9 +33,6 @@ const router = useRouter();
             </svg>
           </span>
         </p>
-
-
-
         </div>
       </div>
     </div>
@@ -57,6 +53,17 @@ const router = useRouter();
           </button>
         </div>
         
+        <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition">
+          <div class="text-4xl mb-4">📅</div>
+          <h3 class="text-xl font-bold text-gray-800 mb-2">Event Management</h3>
+          <p class="text-gray-600 mb-4">Create and manage eco-events</p>
+          <button 
+            @click="router.push('/admin/events')"
+            class="bg-cyan-500 hover:bg-cyan-600 text-white px-4 py-2 rounded-lg w-full">
+            Manage Events
+          </button>
+        </div>
+
         <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition">
           <div class="text-4xl mb-4">📊</div>
           <h3 class="text-xl font-bold text-gray-800 mb-2">View Dashboard</h3>
@@ -86,6 +93,17 @@ const router = useRouter();
             @click="router.push('/ranger/scan')"
             class="bg-cyan-500 hover:bg-cyan-600 text-white px-4 py-2 rounded-lg w-full">
             Scan & Update
+          </button>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition">
+          <div class="text-4xl mb-4">📱</div>
+          <h3 class="text-xl font-bold text-gray-800 mb-2">Event Check-in</h3>
+          <p class="text-gray-600 mb-4">Scan tourist QR codes at events</p>
+          <button 
+            @click="router.push('/ranger/event-scanner')"
+            class="bg-cyan-500 hover:bg-cyan-600 text-white px-4 py-2 rounded-lg w-full">
+            Event Scanner
           </button>
         </div>
 
@@ -122,13 +140,24 @@ const router = useRouter();
         </div>
 
         <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition">
+          <div class="text-4xl mb-4">🎉</div>
+          <h3 class="text-xl font-bold text-gray-800 mb-2">Join Eco-Events</h3>
+          <p class="text-gray-600 mb-4">Participate in community events and earn points</p>
+          <button 
+            @click="router.push('/tourist/events')"
+            class="bg-cyan-500 hover:bg-cyan-600 text-white px-4 py-2 rounded-lg w-full">
+            View Events
+          </button>
+        </div>
+
+        <!-- <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition">
           <div class="text-4xl mb-4">🌿</div>
           <h3 class="text-xl font-bold text-gray-800 mb-2">Do Eco-Actions</h3>
           <p class="text-gray-600 mb-4">Complete tasks and earn points</p>
           <button class="bg-cyan-500 hover:bg-cyan-600 text-white px-4 py-2 rounded-lg w-full">
             View Actions
           </button>
-        </div>
+        </div> -->
 
         <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition">
           <div class="text-4xl mb-4">🏆</div>

@@ -289,7 +289,7 @@ const saveProfile = async () => {
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <!-- Profile Picture Card -->
-      <div class="lg:col-span-1">
+      <div class="lg:col-span-1 space-y-6">
         <div class="bg-white rounded-lg shadow p-6">
           <h2 class="text-lg font-semibold text-gray-900 mb-4">Profile Picture</h2>
           
@@ -368,6 +368,43 @@ const saveProfile = async () => {
             <p class="text-xs text-gray-500 mt-3 text-center">
               JPG, PNG or GIF. Max 2MB
             </p>
+          </div>
+        </div>
+
+        <!-- QR Code Card -->
+        <div class="bg-white rounded-lg shadow p-6">
+          <h2 class="text-lg font-semibold text-gray-900 mb-4">My QR Code</h2>
+          
+          <div class="flex flex-col items-center">
+            <!-- QR Code Display -->
+            <div class="bg-white p-4 rounded-lg border-2 border-gray-200 mb-4">
+              <div class="w-48 h-48 flex items-center justify-center">
+                <img 
+                  :src="`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${userProfile?.user_qr_code || 'USER-' + userProfile?.id}`"
+                  alt="User QR Code"
+                  class="w-full h-full"
+                />
+              </div>
+            </div>
+
+            <div class="text-center mb-4">
+              <p class="text-sm font-medium text-gray-700 mb-1">Your Event Check-in Code</p>
+              <p class="text-xs text-gray-500 font-mono bg-gray-50 px-3 py-2 rounded">
+                {{ userProfile?.user_qr_code || 'USER-' + userProfile?.id }}
+              </p>
+            </div>
+
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 w-full">
+              <div class="flex items-start">
+                <svg class="w-5 h-5 text-blue-600 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                </svg>
+                <div>
+                  <p class="text-sm font-medium text-blue-900 mb-1">How to use:</p>
+                  <p class="text-xs text-blue-700">Show this QR code to rangers at events to verify your attendance and earn points!</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

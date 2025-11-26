@@ -8,6 +8,9 @@ import AdminQR from "../views/AdminQR.vue";
 import RangerScan from "../views/RangerScan.vue";
 import TouristScan from "../views/TouristScan.vue";
 import UserProfile from "../views/UserProfile.vue";
+import EventList from "../views/EventList.vue";
+import EventManagement from "../views/EventManagement.vue";
+import EventScanner from "../views/EventScanner.vue";
 
 const routes = [
   {
@@ -49,6 +52,24 @@ const routes = [
     name: "Profile",
     component: UserProfile,
     meta: { requiresAuth: true },
+  },
+  {
+    path: "/tourist/events",
+    name: "TouristEvents",
+    component: EventList,
+    meta: { requiresAuth: true, role: "tourist" },
+  },
+  {
+    path: "/admin/events",
+    name: "AdminEvents",
+    component: EventManagement,
+    meta: { requiresAuth: true, role: "admin" },
+  },
+  {
+    path: "/ranger/event-scanner",
+    name: "RangerEventScanner",
+    component: EventScanner,
+    meta: { requiresAuth: true, role: "ranger" },
   },
 ];
 
