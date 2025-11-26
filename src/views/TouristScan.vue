@@ -338,32 +338,6 @@ const resetForm = () => {
           <span class="text-2xl">📸</span>
           <span>Scan with Camera</span>
         </button>
-
-        <div class="flex items-center space-x-4">
-          <div class="flex-1 border-t border-gray-300"></div>
-          <span class="text-gray-500 text-sm">OR</span>
-          <div class="flex-1 border-t border-gray-300"></div>
-        </div>
-
-        <!-- Manual Input -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Enter QR Code Manually</label>
-          <input
-            v-model="manualQRCode"
-            type="text"
-            placeholder="e.g., CORAL-1234567890-ABC123"
-            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent outline-none"
-            @keyup.enter="scanQRCode"
-          />
-        </div>
-        
-        <button
-          @click="scanQRCode"
-          :disabled="loading"
-          class="w-full bg-cyan-500 hover:bg-cyan-600 text-white px-6 py-3 rounded-lg font-medium transition disabled:opacity-50"
-        >
-          {{ loading ? 'Searching...' : 'Search Location' }}
-        </button>
       </div>
     </div>
 
@@ -518,7 +492,7 @@ const resetForm = () => {
     <!-- Camera QR Scanner Modal -->
     <div
       v-if="showCameraModal"
-      class="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center p-4 z-50"
+     class="fixed inset-0 backdrop-blur-md bg-black/40 flex items-center justify-center p-4 z-50"
       @click.self="stopCamera"
     >
       <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl p-6">
@@ -545,20 +519,24 @@ const resetForm = () => {
             ></video>
             
             <!-- Scanning Indicator -->
-            <div v-if="scanning" class="absolute top-4 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-4 py-2 rounded-full text-sm font-medium flex items-center space-x-2">
+           <div
+              v-if="scanning"
+              class="absolute top-2 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-2 py-1 rounded-full text-xs font-medium flex items-center space-x-2 whitespace-nowrap"
+            >
               <div class="w-2 h-2 bg-white rounded-full animate-pulse"></div>
               <span>Scanning for QR codes...</span>
             </div>
 
+
             <!-- QR Frame Overlay -->
-            <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <!-- <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
               <div class="w-64 h-64 relative">
                 <div class="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-cyan-400 rounded-tl-lg"></div>
                 <div class="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-cyan-400 rounded-tr-lg"></div>
                 <div class="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-cyan-400 rounded-bl-lg"></div>
                 <div class="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-cyan-400 rounded-br-lg"></div>
               </div>
-            </div>
+            </div> -->
           </div>
 
           <p class="text-center text-gray-600">
@@ -579,19 +557,21 @@ const resetForm = () => {
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">Or Enter Code Manually</label>
             <div class="flex space-x-2">
-              <input
+             <input
                 v-model="manualQRCode"
                 type="text"
                 placeholder="CORAL-1234567890-ABC123"
-                class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent outline-none"
-                @keyup.enter="scanQRCode(); stopCamera();"
+                :disabled="loading"
+                class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+                @keyup.enter="async () => { await scanQRCode(); stopCamera(); }"
               />
-              <button
-                @click="scanQRCode(); stopCamera();"
-                class="bg-cyan-500 hover:bg-cyan-600 text-white px-6 py-3 rounded-lg font-medium transition"
-              >
-                Go
-              </button>
+             <button
+              @click="async () => { await scanQRCode(); stopCamera(); }"
+              :disabled="loading"
+              class="bg-cyan-500 hover:bg-cyan-600 text-white px-6 py-3 rounded-lg font-medium transition disabled:opacity-50 disabled:cursor-not-allowed min-w-[80px]"
+            >
+              {{ loading ? '...' : 'Go' }}
+            </button>
             </div>
           </div>
 

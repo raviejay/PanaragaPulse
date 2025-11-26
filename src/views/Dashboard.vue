@@ -12,13 +12,31 @@ const router = useRouter();
 <template>
   <div>
     <!-- Welcome Card -->
-    <div class="bg-gradient-to-r from-cyan-500 to-blue-500 rounded-2xl p-8 text-white mb-8">
+    <div class="bg-gradient-to-r from-cyan-500 to-teal-500 rounded-2xl p-8 text-white mb-8 whitespace-nowrap">
       <h2 class="text-3xl font-bold mb-2">Welcome back, {{ userProfile?.name }}! 👋</h2>
-      <p class="text-cyan-100 mb-4">You're logged in as a {{ userProfile?.role }}</p>
+      <!-- <p class="text-cyan-100 mb-4">You're logged in as a {{ userProfile?.role }}</p> -->
       <div class="flex items-center space-x-6">
         <div class="bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2">
           <p class="text-sm text-cyan-100">Eco Points</p>
-          <p class="text-2xl font-bold">{{ userProfile?.points || 0 }}</p>
+         <p class="text-3xl font-bold flex items-center gap-1"> 
+          {{ userProfile?.points || 0 }}
+
+          <span class="flex items-center gap-1 text-cyan-100 pt-1">
+            <svg 
+              class="animate-pulse"
+              width="30" 
+              height="30" 
+              viewBox="0 0 24 24" 
+              fill="#0FA958" 
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path d="M12 2L14.8 8.2L21 11L14.8 13.8L12 20L9.2 13.8L3 11L9.2 8.2L12 2Z"/>
+            </svg>
+          </span>
+        </p>
+
+
+
         </div>
       </div>
     </div>

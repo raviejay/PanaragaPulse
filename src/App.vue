@@ -1,40 +1,55 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { supabase } from './js/supabase';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
+import UserProfileDropdown from './components/UserProfileDropdown.vue';
 
 const router = useRouter();
+const route = useRoute();
 const user = ref(null);
 const userProfile = ref(null);
 const loading = ref(true);
 
-// Check if user is logged in
+// Initialize auth
 onMounted(async () => {
-  // Get current session
-  const { data: { session } } = await supabase.auth.getSession();
-  
-  if (session) {
-    user.value = session.user;
-    await fetchUserProfile();
-  }
-  
+  await checkAuth();
   loading.value = false;
 
   // Listen for auth changes
   supabase.auth.onAuthStateChange(async (event, session) => {
-    if (session) {
-      user.value = session.user;
-      await fetchUserProfile();
-      router.push('/dashboard');
-    } else {
-      user.value = null;
-      userProfile.value = null;
-      router.push('/login');
-    }
+    console.log('[Auth] State changed:', event);
+    await checkAuth();
   });
 });
 
-// Fetch user profile from database
+// Check authentication and handle routing
+const checkAuth = async () => {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (session) {
+      user.value = session.user;
+      await fetchUserProfile();
+      
+      // If on login page, redirect to dashboard
+      if (route.path === '/login') {
+        window.location.href = '/dashboard';
+      }
+    } else {
+      user.value = null;
+      userProfile.value = null;
+      
+      // If not on login page, redirect to login
+      if (route.path !== '/login') {
+        window.location.href = '/login';
+      }
+    }
+  } catch (error) {
+    console.error('[Auth] Check failed:', error);
+  }
+};
+
+// Fetch user profile
 const fetchUserProfile = async () => {
   try {
     const { data, error } = await supabase
@@ -45,22 +60,47 @@ const fetchUserProfile = async () => {
     
     if (error) throw error;
     userProfile.value = data;
+    console.log('[Profile] Loaded:', data);
   } catch (error) {
-    console.error('Error fetching profile:', error);
+    console.error('[Profile] Error:', error);
   }
 };
 
-// Logout function
+// Check role access for current route
+const hasRoleAccess = () => {
+  if (!route.meta.role) return true;
+  return userProfile.value?.role === route.meta.role;
+};
+
+// Watch route changes for role-based access
+watch(() => route.path, () => {
+  if (user.value && route.meta.role && !hasRoleAccess()) {
+    console.log('[Access] Denied for route:', route.path);
+    window.location.href = '/dashboard';
+  }
+});
+
+// Simple navigation using window.location (most reliable)
+const navigateTo = (path) => {
+  console.log('[Nav] Going to:', path);
+  window.location.href = path;
+};
+
+// Logout
 const handleLogout = async () => {
   try {
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
+    await supabase.auth.signOut();
     user.value = null;
     userProfile.value = null;
-    router.push('/login');
+    window.location.href = '/login';
   } catch (error) {
-    console.error('Error logging out:', error);
+    console.error('[Logout] Error:', error);
   }
+};
+
+// Check if header should show
+const needsHeader = () => {
+  return user.value && route.path !== '/login';
 };
 </script>
 
@@ -68,48 +108,53 @@ const handleLogout = async () => {
   <!-- Loading State -->
   <div v-if="loading" class="min-h-screen flex items-center justify-center bg-gray-50">
     <div class="text-center">
-      <div class="text-6xl mb-4">🌊</div>
+      <img src="@/assets/logo.png" alt="Loading Icon" class="w-24 h-24 mx-auto mb-4" />
       <p class="text-gray-600">Loading...</p>
     </div>
   </div>
 
-  <!-- Main App with Header (when logged in) -->
-  <div v-else-if="user" class="min-h-screen bg-gray-50">
+
+  <!-- Main App -->
+  <div v-else class="min-h-screen bg-gray-50">
     <!-- Header -->
-    <header class="bg-white shadow-sm">
-      <div class="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
+    <header v-if="needsHeader()" class="bg-white shadow-sm">
+      <div class="max-w-7xl mx-auto px-2 py-2 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between">
-          <div class="flex items-center space-x-3 cursor-pointer" @click="router.push('/dashboard')">
-            <span class="text-3xl">🌊</span>
-            <h1 class="text-2xl font-bold text-gray-900">Panaraga Pulse</h1>
+         <div 
+            class="flex items-center space-x-3 cursor-pointer hover:opacity-80 transition"
+            @click="navigateTo('/dashboard')"
+          >
+            <img 
+              src="@/assets/logo.png" 
+              alt="Logo" 
+              class="w-10 h-10 object-contain m-1"
+            />
+          <h1 class="text-xl font-bold" style="color: #0A3A47;">
+          Panaraga <span style="color: #3CB371;">Pulse</span>
+         </h1>
+
           </div>
+
           
-          <div class="flex items-center space-x-4">
-            <div class="text-right">
-              <p class="text-sm font-medium text-gray-900">{{ userProfile?.name || 'User' }}</p>
-              <p class="text-xs text-gray-500 capitalize">{{ userProfile?.role || 'tourist' }}</p>
-            </div>
-            <button
-              @click="handleLogout"
-              class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition"
-            >
-              Logout
-            </button>
-          </div>
+          <!-- User Profile Dropdown -->
+          <UserProfileDropdown
+            :userProfile="userProfile"
+            :onLogout="handleLogout"
+            :navigateTo="navigateTo"
+          />
         </div>
       </div>
     </header>
 
-    <!-- Main Content (Router View) -->
-    <main class="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-      <router-view :userProfile="userProfile" />
+    <!-- Main Content -->
+    <main :class="needsHeader() ? 'max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8' : ''">
+      <router-view 
+        v-if="user"
+        :userProfile="userProfile" 
+        :navigateTo="navigateTo"
+        :key="route.fullPath" 
+      />
+      <router-view v-else />
     </main>
   </div>
-
-  <!-- Router View for Login (no header) -->
-  <router-view v-else />
 </template>
-
-<style scoped>
-/* Additional custom styles if needed */
-</style>
