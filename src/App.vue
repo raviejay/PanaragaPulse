@@ -18,7 +18,17 @@ onMounted(async () => {
   // Listen for auth changes
   supabase.auth.onAuthStateChange(async (event, session) => {
     console.log('[Auth] State changed:', event);
-    await checkAuth();
+    
+    // Only run checkAuth for specific events to avoid conflicts
+    if (event === 'SIGNED_IN') {
+      await checkAuth();
+    } else if (event === 'SIGNED_OUT') {
+      user.value = null;
+      userProfile.value = null;
+      if (route.path !== '/login') {
+        await router.push('/login');
+      }
+    }
   });
 });
 
@@ -89,12 +99,28 @@ const navigateTo = (path) => {
 // Logout
 const handleLogout = async () => {
   try {
-    await supabase.auth.signOut();
+    console.log('[Logout] Starting logout...');
+    
+    // Clear local state first
     user.value = null;
     userProfile.value = null;
-    router.push('/login');
+    
+    // Sign out from Supabase
+    const { error } = await supabase.auth.signOut();
+    
+    if (error) {
+      console.error('[Logout] Supabase error:', error);
+      throw error;
+    }
+    
+    console.log('[Logout] Successfully signed out');
+    
+    // Navigate to login
+    await router.push('/login');
   } catch (error) {
     console.error('[Logout] Error:', error);
+    // Force navigation to login even if there's an error
+    await router.push('/login');
   }
 };
 

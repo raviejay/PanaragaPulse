@@ -1,7 +1,8 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, computed, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { supabase } from '../js/supabase';
+import QrScanner from 'qr-scanner';
 
 const router = useRouter();
 const showScanner = ref(false);
@@ -24,7 +25,72 @@ const coralPhotoPreview = ref('');
 // Manual QR input
 const manualQRCode = ref('');
 
-// Scan QR Code (Manual Input for now)
+// Camera QR scanning
+const showCameraModal = ref(false);
+const qrScanner = ref(null);
+const cameraError = ref('');
+const scanning = ref(false);
+
+// Start camera for QR scanning with auto-detection
+const startCamera = async () => {
+  try {
+    cameraError.value = '';
+    showCameraModal.value = true;
+    scanning.value = true;
+    
+    // Wait for next tick to ensure video element is rendered
+    await new Promise(resolve => setTimeout(resolve, 100));
+    const videoElement = document.getElementById('qr-video-ranger');
+    
+    if (!videoElement) {
+      cameraError.value = 'Camera element not found';
+      return;
+    }
+
+    // Initialize QR Scanner
+    qrScanner.value = new QrScanner(
+      videoElement,
+      result => {
+        // QR Code detected!
+        manualQRCode.value = result.data;
+        stopCamera();
+        scanQRCode();
+      },
+      {
+        returnDetailedScanResult: true,
+        highlightScanRegion: true,
+        highlightCodeOutline: true,
+        preferredCamera: 'environment'
+      }
+    );
+
+    await qrScanner.value.start();
+    
+  } catch (err) {
+    cameraError.value = 'Camera access denied or not available. Please use manual input instead.';
+    console.error('Camera error:', err);
+    scanning.value = false;
+  }
+};
+
+// Stop camera
+const stopCamera = () => {
+  if (qrScanner.value) {
+    qrScanner.value.stop();
+    qrScanner.value.destroy();
+    qrScanner.value = null;
+  }
+  showCameraModal.value = false;
+  cameraError.value = '';
+  scanning.value = false;
+};
+
+// Cleanup on component unmount
+onUnmounted(() => {
+  stopCamera();
+});
+
+// Scan QR Code
 const scanQRCode = async () => {
   try {
     loading.value = true;
@@ -76,7 +142,6 @@ const scanQRCode = async () => {
       coralPhotoPreview.value = '';
     }
 
-    showScanner.value = false;
     success.value = `QR Code found: ${qrResult.location_name}`;
 
   } catch (err) {
@@ -206,6 +271,7 @@ const resetForm = () => {
   coralPhotoPreview.value = '';
   manualQRCode.value = '';
   success.value = '';
+  stopCamera();
 };
 </script>
 
@@ -233,12 +299,24 @@ const resetForm = () => {
       <div class="text-center mb-6">
         <div class="text-6xl mb-4">📷</div>
         <h3 class="text-xl font-bold text-gray-800 mb-2">Scan QR Code</h3>
-        <p class="text-gray-600">Enter the QR code from the coral location</p>
+        <p class="text-gray-600">Scan with camera or enter the code manually</p>
       </div>
 
       <div class="max-w-md mx-auto space-y-4">
+        <!-- Camera Scan Button -->
+        <button
+          @click="startCamera"
+          class="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-6 py-4 rounded-lg font-medium transition flex items-center justify-center space-x-2"
+        >
+          <span class="text-2xl">📸</span>
+          <span>Scan with Camera</span>
+        </button>
+        
+        <!-- <div class="text-center text-gray-500">or</div>
+        
+       
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">QR Code</label>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Enter QR Code Manually</label>
           <input
             v-model="manualQRCode"
             type="text"
@@ -254,7 +332,7 @@ const resetForm = () => {
           class="w-full bg-cyan-500 hover:bg-cyan-600 text-white px-6 py-3 rounded-lg font-medium transition disabled:opacity-50"
         >
           {{ loading ? 'Searching...' : 'Find Location' }}
-        </button>
+        </button> -->
       </div>
     </div>
 
@@ -383,6 +461,91 @@ const resetForm = () => {
             </button>
           </div>
         </form>
+      </div>
+    </div>
+
+    <!-- Camera QR Scanner Modal -->
+    <div
+      v-if="showCameraModal"
+      class="fixed inset-0 backdrop-blur-md bg-black/40 flex items-center justify-center p-4 z-50"
+      @click.self="stopCamera"
+    >
+      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-2xl font-bold text-gray-800">📸 Scan QR Code</h3>
+          <button
+            @click="stopCamera"
+            class="text-gray-400 hover:text-gray-600 text-2xl"
+          >
+            ✕
+          </button>
+        </div>
+
+        <div v-if="cameraError" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4">
+          {{ cameraError }}
+        </div>
+
+        <div class="space-y-4">
+          <!-- Camera Preview -->
+          <div class="relative bg-gray-900 rounded-lg overflow-hidden" style="aspect-ratio: 4/3;">
+            <video
+              id="qr-video-ranger"
+              class="w-full h-full object-cover"
+            ></video>
+            
+            <!-- Scanning Indicator -->
+            <div
+              v-if="scanning"
+              class="absolute top-2 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-2 py-1 rounded-full text-xs font-medium flex items-center space-x-2 whitespace-nowrap"
+            >
+              <div class="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+              <span>Scanning for QR codes...</span>
+            </div>
+          </div>
+
+          <p class="text-center text-gray-600">
+            Position the QR code within the frame - it will scan automatically!
+          </p>
+
+          <!-- Instructions -->
+          <div class="bg-cyan-50 border border-cyan-200 rounded-lg p-4">
+            <p class="text-sm text-cyan-800">
+              <span class="font-semibold">📌 Tips:</span> 
+              <br>• Keep the QR code steady within the frame
+              <br>• Make sure there's good lighting
+              <br>• Hold your device about 6-12 inches away
+            </p>
+          </div>
+
+          <!-- Manual Input (shown in modal) -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Or Enter Code Manually</label>
+            <div class="flex space-x-2">
+              <input
+                v-model="manualQRCode"
+                type="text"
+                placeholder="CORAL-1234567890-ABC123"
+                :disabled="loading"
+                class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+                @keyup.enter="async () => { await scanQRCode(); stopCamera(); }"
+              />
+              <button
+                @click="async () => { await scanQRCode(); stopCamera(); }"
+                :disabled="loading"
+                class="bg-cyan-500 hover:bg-cyan-600 text-white px-6 py-3 rounded-lg font-medium transition disabled:opacity-50 disabled:cursor-not-allowed min-w-[80px]"
+              >
+                {{ loading ? '...' : 'Go' }}
+              </button>
+            </div>
+          </div>
+
+          <button
+            @click="stopCamera"
+            class="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-3 rounded-lg font-medium transition"
+          >
+            Cancel
+          </button>
+        </div>
       </div>
     </div>
   </div>

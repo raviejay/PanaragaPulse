@@ -23,7 +23,7 @@ const message = ref({ type: '', text: '' });
 const fetchEvents = async () => {
   loading.value = true;
   try {
-    // Fetch all events
+    // Fetch all events (no status filter)
     const { data: eventsData, error: eventsError } = await supabase
       .from('events')
       .select(`
@@ -31,7 +31,7 @@ const fetchEvents = async () => {
         created_by_user:users!events_created_by_fkey(name),
         participants:event_participants(user_id)
       `)
-      .order('event_date', { ascending: true });
+      .order('event_date', { ascending: false });
 
     if (eventsError) throw eventsError;
 
@@ -109,6 +109,23 @@ const isPastEvent = (dateString) => {
   return new Date(dateString) < new Date();
 };
 
+// Check if user can join event (only upcoming or ongoing, not past/cancelled/completed)
+const canJoinEvent = (event) => {
+  if (event.status === 'cancelled' || event.status === 'completed') {
+    return false;
+  }
+  if (isPastEvent(event.event_date)) {
+    return false;
+  }
+  if (isEventFull(event)) {
+    return false;
+  }
+  if (isJoined(event.id)) {
+    return false;
+  }
+  return event.status === 'upcoming' || event.status === 'ongoing';
+};
+
 // Join event
 const joinEvent = async (eventId) => {
   try {
@@ -135,7 +152,13 @@ const joinEvent = async (eventId) => {
 };
 
 // Leave event
-const leaveEvent = async (eventId) => {
+const leaveEvent = async (eventId, eventDate, eventStatus) => {
+  // Check if event has already started or ended
+  if (isPastEvent(eventDate) || eventStatus === 'completed' || eventStatus === 'cancelled') {
+    message.value = { type: 'error', text: 'Cannot leave an event that has already started or ended' };
+    return;
+  }
+
   if (!confirm('Are you sure you want to leave this event?')) return;
 
   try {
@@ -156,19 +179,16 @@ const leaveEvent = async (eventId) => {
   }
 };
 
-// Filter events for available tab
+// Filter events for available tab - show all events
 const availableEvents = computed(() => {
-  return events.value.filter(event => 
-    event.status === 'ongoing' && 
-    !isPastEvent(event.event_date)
-  );
+  return events.value; // Show all events regardless of status
 });
 
 // Filter events for my events tab
 const myUpcomingEvents = computed(() => {
   return myEvents.value.filter(p => 
     p.event && 
-    p.event.status === 'ongoing' && 
+    p.event.status === 'upcoming' && 
     !isPastEvent(p.event.event_date)
   );
 });
@@ -365,6 +385,20 @@ onMounted(() => {
               Already Joined
             </button>
             <button
+              v-else-if="event.status === 'cancelled'"
+              disabled
+              class="w-full bg-red-100 text-red-600 px-4 py-2 rounded-lg font-medium cursor-not-allowed"
+            >
+              Event Cancelled
+            </button>
+            <button
+              v-else-if="event.status === 'completed' || isPastEvent(event.event_date)"
+              disabled
+              class="w-full bg-gray-100 text-gray-500 px-4 py-2 rounded-lg font-medium cursor-not-allowed"
+            >
+              Event Ended
+            </button>
+            <button
               v-else-if="isEventFull(event)"
               disabled
               class="w-full bg-gray-100 text-gray-500 px-4 py-2 rounded-lg font-medium cursor-not-allowed"
@@ -372,11 +406,18 @@ onMounted(() => {
               Event Full
             </button>
             <button
-              v-else
+              v-else-if="canJoinEvent(event)"
               @click="joinEvent(event.id)"
               class="w-full bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium transition"
             >
               Join Event
+            </button>
+            <button
+              v-else
+              disabled
+              class="w-full bg-gray-100 text-gray-500 px-4 py-2 rounded-lg font-medium cursor-not-allowed"
+            >
+              Cannot Join
             </button>
           </div>
         </div>
@@ -447,12 +488,20 @@ onMounted(() => {
                 </div>
               </div>
 
+              <!-- Leave Button (only if event hasn't started) -->
               <button
-                @click="leaveEvent(participant.event.id)"
+                v-if="!isPastEvent(participant.event.event_date) && participant.event.status !== 'completed' && participant.event.status !== 'cancelled'"
+                @click="leaveEvent(participant.event.id, participant.event.event_date, participant.event.status)"
                 class="w-full bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2 rounded-lg font-medium transition"
               >
                 Leave Event
               </button>
+              <div
+                v-else
+                class="w-full bg-gray-100 text-gray-500 px-4 py-2 rounded-lg text-center text-sm font-medium"
+              >
+                {{ participant.attended ? 'Event Completed' : 'Cannot leave past events' }}
+              </div>
             </div>
           </div>
         </div>
