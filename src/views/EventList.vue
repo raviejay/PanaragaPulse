@@ -16,7 +16,7 @@ const props = defineProps({
 const events = ref([]);
 const myEvents = ref([]);
 const loading = ref(true);
-const activeTab = ref('available'); // 'available' or 'my-events'
+const activeTab = ref('available'); // 'available', 'my-events', or 'ongoing'
 const message = ref({ type: '', text: '' });
 
 // Fetch all events
@@ -109,6 +109,17 @@ const isPastEvent = (dateString) => {
   return new Date(dateString) < new Date();
 };
 
+// Check if event is currently ongoing (happening now)
+const isOngoingEvent = (event) => {
+  if (event.status === 'ongoing') return true;
+  
+  const now = new Date();
+  const eventDate = new Date(event.event_date);
+  // Consider event ongoing if it's within 6 hours of start time
+  const sixHoursLater = new Date(eventDate.getTime() + 6 * 60 * 60 * 1000);
+  return now >= eventDate && now <= sixHoursLater;
+};
+
 // Check if user can join event (only upcoming or ongoing, not past/cancelled/completed)
 const canJoinEvent = (event) => {
   if (event.status === 'cancelled' || event.status === 'completed') {
@@ -184,12 +195,21 @@ const availableEvents = computed(() => {
   return events.value; // Show all events regardless of status
 });
 
-// Filter events for my events tab
+// Filter events for ongoing tab - events user joined that are ongoing
+const myOngoingEvents = computed(() => {
+  return myEvents.value.filter(p => 
+    p.event && 
+    (p.event.status === 'ongoing' || isOngoingEvent(p.event))
+  );
+});
+
+// Filter events for my events tab (upcoming)
 const myUpcomingEvents = computed(() => {
   return myEvents.value.filter(p => 
     p.event && 
     p.event.status === 'upcoming' && 
-    !isPastEvent(p.event.event_date)
+    !isPastEvent(p.event.event_date) &&
+    !isOngoingEvent(p.event)
   );
 });
 
@@ -278,6 +298,15 @@ onMounted(() => {
             Available Events ({{ availableEvents.length }})
           </button>
           <button
+            @click="activeTab = 'ongoing'"
+            class="py-4 px-6 text-sm font-medium border-b-2 transition"
+            :class="activeTab === 'ongoing' 
+              ? 'border-blue-500 text-blue-600' 
+              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+          >
+            Ongoing Events ({{ myOngoingEvents.length }})
+          </button>
+          <button
             @click="activeTab = 'my-events'"
             class="py-4 px-6 text-sm font-medium border-b-2 transition"
             :class="activeTab === 'my-events' 
@@ -356,7 +385,7 @@ onMounted(() => {
 
               <div class="flex items-center text-sm text-gray-600">
                 <svg class="w-5 h-5 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
                 {{ getParticipantCount(event) }}{{ event.max_participants ? `/${event.max_participants}` : '' }} participants
               </div>
@@ -419,6 +448,106 @@ onMounted(() => {
             >
               Cannot Join
             </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ongoing Events Tab -->
+    <div v-else-if="activeTab === 'ongoing'">
+      <div v-if="myOngoingEvents.length === 0" class="text-center py-12 bg-white rounded-lg shadow">
+        <div class="text-6xl mb-4">⏰</div>
+        <h3 class="text-xl font-semibold text-gray-700 mb-2">No Ongoing Events</h3>
+        <p class="text-gray-500 mb-4">You don't have any events happening right now</p>
+        <button
+          @click="activeTab = 'available'"
+          class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg font-medium transition"
+        >
+          Browse Events
+        </button>
+      </div>
+
+      <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div
+          v-for="participant in myOngoingEvents"
+          :key="participant.id"
+          class="bg-white rounded-lg shadow-lg border-2 border-green-300 relative"
+        >
+          <!-- Live Badge -->
+          <div class="absolute -top-3 -right-3">
+            <span class="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium flex items-center animate-pulse">
+              <span class="w-2 h-2 bg-white rounded-full mr-2"></span>
+              LIVE NOW
+            </span>
+          </div>
+
+          <!-- Event Image -->
+          <div v-if="participant.event.event_image_url" class="h-48 overflow-hidden rounded-t-lg">
+            <img :src="participant.event.event_image_url" :alt="participant.event.title" class="w-full h-full object-cover" />
+          </div>
+          <div v-else class="h-48 bg-gradient-to-br from-green-400 to-blue-500 rounded-t-lg flex items-center justify-center">
+            <span class="text-6xl">🌊</span>
+          </div>
+
+          <!-- Event Details -->
+          <div class="p-6">
+            <h3 class="text-xl font-bold text-gray-900 mb-3">{{ participant.event.title }}</h3>
+            <p class="text-gray-600 text-sm mb-4">{{ participant.event.description }}</p>
+
+            <div class="space-y-2 mb-4">
+              <div class="flex items-center text-sm text-gray-600">
+                <svg class="w-5 h-5 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                {{ formatDate(participant.event.event_date) }}
+              </div>
+
+              <div class="flex items-center text-sm text-gray-600">
+                <svg class="w-5 h-5 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                {{ formatTime(participant.event.event_date) }}
+              </div>
+
+              <div class="flex items-center text-sm text-gray-600">
+                <svg class="w-5 h-5 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                {{ participant.event.location }}
+              </div>
+            </div>
+
+            <!-- Important Notice -->
+            <div class="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <div class="flex items-start">
+                <svg class="w-5 h-5 mr-2 text-yellow-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                </svg>
+                <div>
+                  <p class="text-sm font-medium text-yellow-800">Event in Progress</p>
+                  <p class="text-xs text-yellow-700 mt-1">Make sure to attend and check in with the event organizer</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Points Info -->
+            <div class="flex items-center justify-between py-3 px-4 bg-gradient-to-r from-green-50 to-teal-50 rounded-lg border border-green-200 mb-4">
+              <span class="text-sm font-medium text-gray-700">Points Reward</span>
+              <div class="flex items-center space-x-1">
+                <span class="text-lg font-bold text-green-600">{{ participant.event.points_reward }}</span>
+                <svg class="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2L14.8 8.2L21 11L14.8 13.8L12 20L9.2 13.8L3 11L9.2 8.2L12 2Z"/>
+                </svg>
+              </div>
+            </div>
+
+            <!-- Status Message -->
+            <div class="text-center p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <p class="text-sm text-blue-700 font-medium">
+                {{ participant.attended ? 'Attendance Verified ✓' : 'Waiting for attendance verification' }}
+              </p>
+            </div>
           </div>
         </div>
       </div>

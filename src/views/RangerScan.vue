@@ -30,6 +30,7 @@ const showCameraModal = ref(false);
 const qrScanner = ref(null);
 const cameraError = ref('');
 const scanning = ref(false);
+const processingQR = ref(false);
 
 // Start camera for QR scanning with auto-detection
 const startCamera = async () => {
@@ -50,11 +51,22 @@ const startCamera = async () => {
     // Initialize QR Scanner
     qrScanner.value = new QrScanner(
       videoElement,
-      result => {
+      async result => {
         // QR Code detected!
+        if (processingQR.value) return; // Prevent multiple scans
+        
+        processingQR.value = true;
+        scanning.value = false;
         manualQRCode.value = result.data;
-        stopCamera();
-        scanQRCode();
+        
+        await scanQRCode();
+        
+        if (!error.value) {
+          stopCamera();
+        } else {
+          processingQR.value = false;
+          scanning.value = true;
+        }
       },
       {
         returnDetailedScanResult: true,
@@ -83,6 +95,7 @@ const stopCamera = () => {
   showCameraModal.value = false;
   cameraError.value = '';
   scanning.value = false;
+  processingQR.value = false;
 };
 
 // Cleanup on component unmount
@@ -388,7 +401,7 @@ const resetForm = () => {
           <!-- Seagrass Status -->
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">
-              Seagrass Status <span class="text-red-500">*</span>
+              Status <span class="text-red-500">*</span>
             </label>
             <input
               v-model="seagrassStatus"
@@ -501,6 +514,18 @@ const resetForm = () => {
               <div class="w-2 h-2 bg-white rounded-full animate-pulse"></div>
               <span>Scanning for QR codes...</span>
             </div>
+            
+            <!-- Processing QR Code Indicator -->
+            <div
+              v-if="processingQR"
+              class="absolute inset-0 bg-black/60 flex items-center justify-center"
+            >
+              <div class="bg-white rounded-lg p-6 text-center">
+                <div class="w-12 h-12 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+                <p class="text-gray-800 font-medium">Processing QR Code...</p>
+                <p class="text-gray-600 text-sm mt-1">Fetching location data</p>
+              </div>
+            </div>
           </div>
 
           <p class="text-center text-gray-600">
@@ -525,16 +550,16 @@ const resetForm = () => {
                 v-model="manualQRCode"
                 type="text"
                 placeholder="CORAL-1234567890-ABC123"
-                :disabled="loading"
+                :disabled="loading || processingQR"
                 class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent outline-none disabled:opacity-50 disabled:cursor-not-allowed"
                 @keyup.enter="async () => { await scanQRCode(); stopCamera(); }"
               />
               <button
                 @click="async () => { await scanQRCode(); stopCamera(); }"
-                :disabled="loading"
+                :disabled="loading || processingQR"
                 class="bg-cyan-500 hover:bg-cyan-600 text-white px-6 py-3 rounded-lg font-medium transition disabled:opacity-50 disabled:cursor-not-allowed min-w-[80px]"
               >
-                {{ loading ? '...' : 'Go' }}
+                {{ loading || processingQR ? '...' : 'Go' }}
               </button>
             </div>
           </div>

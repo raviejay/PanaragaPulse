@@ -194,14 +194,15 @@ onMounted(() => {
     </button>
 
     <!-- Header -->
-    <div class="flex items-center justify-between mb-6">
-      <div>
-        <h2 class="text-2xl font-bold text-gray-800">QR Code Management</h2>
-        <p class="text-gray-600 mt-1">Create and manage coral location QR codes</p>
+   <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+      <div class="flex-1 min-w-0">
+        <h2 class="text-2xl sm:text-2xl font-bold text-gray-800 break-words">QR Code Management</h2>
+        <p class="text-sm sm:text-base text-gray-600 mt-1">Create and manage coral location QR codes</p>
       </div>
       <button
         @click="showCreateModal = true"
-        class="bg-cyan-500 hover:bg-cyan-600 text-white px-6 py-3 rounded-lg font-medium transition flex items-center space-x-2"
+        class="bg-cyan-500 hover:bg-cyan-600 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg font-medium transition flex items-center justify-center space-x-2 whitespace-nowrap flex-shrink-0"
       >
         <span class="text-xl">➕</span>
         <span>Create QR Code</span>

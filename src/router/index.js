@@ -91,7 +91,7 @@ const routes = [
     meta: { requiresAuth: true, role: "admin" },
   },
   {
-    path: "/admin/event-participants/:eventId",
+    path: "/admin/event-participants",
     name: "EventParticipants",
     component: EventParticipants,
     meta: { requiresAuth: true, role: "admin" },

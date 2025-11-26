@@ -75,14 +75,14 @@ const router = useRouter();
           </button>
         </div>
 
-        <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition">
+        <!-- <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition">
           <div class="text-4xl mb-4">📊</div>
           <h3 class="text-xl font-bold text-gray-800 mb-2">View Dashboard</h3>
           <p class="text-gray-600 mb-4">Monitor all activities and submissions</p>
           <button class="bg-cyan-500 hover:bg-cyan-600 text-white px-4 py-2 rounded-lg w-full">
             View Analytics
           </button>
-        </div>
+        </div> -->
 
         <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition">
           <div class="text-4xl mb-4">👥</div>
@@ -163,14 +163,14 @@ const router = useRouter();
           </button>
         </div>
 
-        <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition">
+        <!-- <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition">
           <div class="text-4xl mb-4">🌿</div>
           <h3 class="text-xl font-bold text-gray-800 mb-2">Do Eco-Actions</h3>
           <p class="text-gray-600 mb-4">Complete tasks and earn points</p>
           <button class="bg-cyan-500 hover:bg-cyan-600 text-white px-4 py-2 rounded-lg w-full">
             View Actions
           </button>
-        </div>
+        </div> -->
 
         <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition">
           <div class="text-4xl mb-4">🎁</div>

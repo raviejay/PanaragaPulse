@@ -306,7 +306,8 @@ onMounted(() => {
 <template>
   <div class="max-w-7xl mx-auto">
     <!-- Page Header -->
-    <div class="mb-8">
+    <!-- Page Header -->
+    <div class="mb-6 sm:mb-8">
       <button
         @click="navigateTo('/dashboard')"
         class="flex items-center text-gray-600 hover:text-gray-900 mb-4 transition"
@@ -316,15 +317,15 @@ onMounted(() => {
         </svg>
         Back to Dashboard
       </button>
-      <div class="flex items-center justify-between">
-        <div>
-          <h1 class="text-3xl font-bold text-gray-900">Rewards Management</h1>
-          <p class="text-gray-600 mt-1">Manage rewards and redemptions</p>
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div class="flex-1 min-w-0">
+          <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 break-words">Rewards Management</h1>
+          <p class="text-sm sm:text-base text-gray-600 mt-1">Manage rewards and redemptions</p>
         </div>
         <button
           v-if="activeView === 'rewards'"
           @click="openCreateModal"
-          class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-medium transition flex items-center"
+          class="bg-blue-500 hover:bg-blue-600 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg font-medium transition flex items-center justify-center whitespace-nowrap flex-shrink-0"
         >
           <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />

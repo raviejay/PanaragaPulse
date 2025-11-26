@@ -308,7 +308,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="max-w-7xl mx-auto">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <!-- Page Header -->
     <div class="mb-8">
       <button
@@ -321,20 +321,20 @@ onMounted(() => {
         Back to Events
       </button>
       
-      <div class="flex items-start justify-between">
-        <div class="flex-1">
-          <h1 class="text-3xl font-bold text-gray-900 mb-2">Event Participants</h1>
+      <div class="flex flex-col sm:flex-row items-start justify-between gap-4">
+        <div class="flex-1 w-full">
+          <h1 class="text-xl sm:text-3xl font-bold text-gray-900 mb-2">Event Participants</h1>
           <div v-if="event" class="space-y-1">
-            <p class="text-xl text-gray-700 font-medium">{{ event.title }}</p>
-            <div class="flex items-center text-gray-600 space-x-4 text-sm">
+            <p class="text-base sm:text-xl text-gray-700 font-medium">{{ event.title }}</p>
+            <div class="flex flex-col sm:flex-row sm:items-center text-gray-600 space-y-1 sm:space-y-0 sm:space-x-4 text-xs sm:text-sm">
               <span class="flex items-center">
-                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-3 h-3 sm:w-4 sm:h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
                 {{ formatDate(event.event_date) }}
               </span>
               <span class="flex items-center">
-                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-3 h-3 sm:w-4 sm:h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
@@ -344,27 +344,29 @@ onMounted(() => {
           </div>
         </div>
         
-        <div class="flex gap-3">
+        <div class="flex gap-2 sm:gap-3 w-full sm:w-auto">
           <button
             @click="exportToPDF"
             :disabled="isExporting || participants.length === 0"
-            class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-medium transition flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
+            class="bg-green-500 hover:bg-green-600 text-white px-3 py-2 sm:px-6 sm:py-3 rounded-lg text-sm sm:text-base font-medium transition flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed flex-1 sm:flex-initial"
           >
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-4 h-4 sm:w-5 sm:h-5 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
-            {{ isExporting ? 'Exporting...' : 'Export PDF' }}
+            <span class="hidden sm:inline">{{ isExporting ? 'Exporting...' : 'Export PDF' }}</span>
+            <span class="sm:hidden">PDF</span>
           </button>
           
           <button
             @click="exportToCSV"
             :disabled="participants.length === 0"
-            class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-medium transition flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
+            class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 sm:px-6 sm:py-3 rounded-lg text-sm sm:text-base font-medium transition flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed flex-1 sm:flex-initial"
           >
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-4 h-4 sm:w-5 sm:h-5 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
-            Export CSV
+            <span class="hidden sm:inline">Export CSV</span>
+            <span class="sm:hidden">CSV</span>
           </button>
         </div>
       </div>
@@ -475,19 +477,19 @@ onMounted(() => {
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
             <tr>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 #
               </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Name
               </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th class="hidden md:table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Email
               </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th class="hidden lg:table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Registered On
               </th>
-              <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th class="px-3 sm:px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Attendance
               </th>
             </tr>
@@ -498,40 +500,43 @@ onMounted(() => {
               :key="participant.id"
               class="hover:bg-gray-50 transition"
             >
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                 {{ index + 1 }}
               </td>
-              <td class="px-6 py-4 whitespace-nowrap">
+              <td class="px-3 sm:px-6 py-4 whitespace-nowrap">
                 <div class="flex items-center">
-                  <div class="flex-shrink-0 h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center">
-                    <span class="text-blue-600 font-medium text-sm">
+                  <div class="flex-shrink-0 h-8 w-8 sm:h-10 sm:w-10 bg-blue-100 rounded-full flex items-center justify-center">
+                    <span class="text-blue-600 font-medium text-xs sm:text-sm">
                       {{ participant.users?.name?.charAt(0).toUpperCase() || 'U' }}
                     </span>
                   </div>
-                  <div class="ml-4">
-                    <div class="text-sm font-medium text-gray-900">
+                  <div class="ml-3 sm:ml-4">
+                    <div class="text-xs sm:text-sm font-medium text-gray-900">
                       {{ participant.users?.name || 'Unknown User' }}
+                    </div>
+                    <div class="md:hidden text-xs text-gray-500">
+                      {{ participant.users?.email || 'N/A' }}
                     </div>
                   </div>
                 </div>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+              <td class="hidden md:table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                 {{ participant.users?.email || 'N/A' }}
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+              <td class="hidden lg:table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                 {{ formatDate(participant.joined_at) }}
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-center">
+              <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-center">
                 <button
                   @click="toggleAttendance(participant.id, participant.attended)"
-                  class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium transition"
+                  class="inline-flex items-center px-2 py-1 sm:px-3 sm:py-1 rounded-full text-xs font-medium transition"
                   :class="{
                     'bg-green-100 text-green-800 hover:bg-green-200': participant.attended,
                     'bg-red-100 text-red-800 hover:bg-red-200': !participant.attended
                   }"
                 >
                   <svg
-                    class="w-4 h-4 mr-1"
+                    class="w-3 h-3 sm:w-4 sm:h-4 mr-1"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -551,7 +556,7 @@ onMounted(() => {
                       d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
                     />
                   </svg>
-                  {{ participant.attended ? 'Present' : 'Absent' }}
+                  <span class="hidden sm:inline">{{ participant.attended ? 'Present' : 'Absent' }}</span>
                 </button>
               </td>
             </tr>
