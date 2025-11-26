@@ -358,7 +358,7 @@ const resetForm = () => {
         </button>
         
         <!-- Manual Input Option -->
-        <div class="text-center text-gray-500">or</div>
+        <!-- <div class="text-center text-gray-500">or</div>
         
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2">Enter QR Code Manually</label>
@@ -377,7 +377,7 @@ const resetForm = () => {
           class="w-full bg-cyan-500 hover:bg-cyan-600 text-white px-6 py-3 rounded-lg font-medium transition disabled:opacity-50"
         >
           {{ loading ? 'Searching...' : 'Find Location' }}
-        </button>
+        </button> -->
       </div>
     </div>
 
