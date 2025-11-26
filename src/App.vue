@@ -31,17 +31,17 @@ const checkAuth = async () => {
       user.value = session.user;
       await fetchUserProfile();
       
-      // If on login page, redirect to dashboard
+      // If on login page, redirect to dashboard using Vue Router
       if (route.path === '/login') {
-        window.location.href = '/dashboard';
+        router.push('/dashboard');
       }
     } else {
       user.value = null;
       userProfile.value = null;
       
-      // If not on login page, redirect to login
+      // If not on login page, redirect to login using Vue Router
       if (route.path !== '/login') {
-        window.location.href = '/login';
+        router.push('/login');
       }
     }
   } catch (error) {
@@ -76,14 +76,14 @@ const hasRoleAccess = () => {
 watch(() => route.path, () => {
   if (user.value && route.meta.role && !hasRoleAccess()) {
     console.log('[Access] Denied for route:', route.path);
-    window.location.href = '/dashboard';
+    router.push('/dashboard');
   }
 });
 
-// Simple navigation using window.location (most reliable)
+// Use Vue Router for navigation (fixes the 404 issue)
 const navigateTo = (path) => {
   console.log('[Nav] Going to:', path);
-  window.location.href = path;
+  router.push(path);
 };
 
 // Logout
@@ -92,7 +92,7 @@ const handleLogout = async () => {
     await supabase.auth.signOut();
     user.value = null;
     userProfile.value = null;
-    window.location.href = '/login';
+    router.push('/login');
   } catch (error) {
     console.error('[Logout] Error:', error);
   }
@@ -113,14 +113,13 @@ const needsHeader = () => {
     </div>
   </div>
 
-
   <!-- Main App -->
   <div v-else class="min-h-screen bg-gray-50">
     <!-- Header -->
     <header v-if="needsHeader()" class="bg-white shadow-sm">
       <div class="max-w-7xl mx-auto px-2 py-2 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between">
-         <div 
+          <div 
             class="flex items-center space-x-3 cursor-pointer hover:opacity-80 transition"
             @click="navigateTo('/dashboard')"
           >
@@ -129,12 +128,10 @@ const needsHeader = () => {
               alt="Logo" 
               class="w-10 h-10 object-contain m-1"
             />
-          <h1 class="text-xl font-bold" style="color: #0A3A47;">
-          Panaraga <span style="color: #3CB371;">Pulse</span>
-         </h1>
-
+            <h1 class="text-xl font-bold" style="color: #0A3A47;">
+              Panaraga <span style="color: #3CB371;">Pulse</span>
+            </h1>
           </div>
-
           
           <!-- User Profile Dropdown -->
           <UserProfileDropdown
