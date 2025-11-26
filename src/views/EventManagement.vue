@@ -286,9 +286,11 @@ const deleteEvent = async (eventId) => {
   }
 };
 
-// View participants
+
 const viewParticipants = (eventId) => {
-  props.navigateTo(`/admin/event-participants/${eventId}`);
+  // Store eventId in a way your app can access it
+  sessionStorage.setItem('currentEventId', eventId);
+  props.navigateTo('/admin/event-participants');
 };
 
 onMounted(() => {

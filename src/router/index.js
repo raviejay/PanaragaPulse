@@ -11,6 +11,10 @@ import UserProfile from "../views/UserProfile.vue";
 import EventList from "../views/EventList.vue";
 import EventManagement from "../views/EventManagement.vue";
 import EventScanner from "../views/EventScanner.vue";
+import RewardsShop from "../views/RewardsShop.vue";
+import AdminRewardsManagement from "../views/RewardsManagement.vue";
+import EventParticipants from "@/views/EventParticipants.vue";
+import UserManagement from "../views/UserManagement.vue";
 
 const routes = [
   {
@@ -71,6 +75,34 @@ const routes = [
     component: EventScanner,
     meta: { requiresAuth: true, role: "ranger" },
   },
+ 
+  {
+    path: "/tourist/rewards",
+    name: "TouristRewards",
+    component: RewardsShop,
+    meta: { requiresAuth: true, role: "tourist" },
+  },
+
+
+  {
+    path: "/admin/rewards",
+    name: "AdminRewards",
+    component: AdminRewardsManagement,
+    meta: { requiresAuth: true, role: "admin" },
+  },
+  {
+    path: "/admin/event-participants/:eventId",
+    name: "EventParticipants",
+    component: EventParticipants,
+    meta: { requiresAuth: true, role: "admin" },
+  },
+  {
+    path: "/admin/user-management",
+    name: "UserManagement",
+    component: UserManagement,
+    meta: { requiresAuth: true, role: "admin" },
+  }
+
 ];
 
 const router = createRouter({

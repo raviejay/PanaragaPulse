@@ -132,12 +132,21 @@ const needsHeader = () => {
 
 <template>
   <!-- Loading State -->
-  <div v-if="loading" class="min-h-screen flex items-center justify-center bg-gray-50">
-    <div class="text-center">
-      <img src="@/assets/logo.png" alt="Loading Icon" class="w-24 h-24 mx-auto mb-4" />
-      <p class="text-gray-600">Loading...</p>
-    </div>
+<!-- Loading State -->
+<div v-if="loading" class="min-h-screen flex flex-col items-center justify-center bg-gray-50">
+  
+  <img src="@/assets/logo.png" alt="Loading Icon" class="w-24 h-24 mx-auto mb-6" />
+
+  <!-- Wave Loading Bar -->
+  <div class="wave-loader">
+    <div class="wave"></div>
+    <div class="wave"></div>
+    <div class="wave"></div>
+    <div class="wave"></div>
+    <div class="wave"></div>
   </div>
+</div>
+
 
   <!-- Main App -->
   <div v-else class="min-h-screen bg-gray-50">
@@ -181,3 +190,39 @@ const needsHeader = () => {
     </main>
   </div>
 </template>
+
+<style scoped>
+  .wave-loader {
+  display: flex;
+  gap: 6px;
+  width: 120px;
+  height: 20px;
+  align-items: flex-end;
+}
+
+.wave {
+  width: 20px;
+  height: 100%;
+  background: #3CB371;
+  border-radius: 6px;
+  animation: waveAnim 1s infinite ease-in-out;
+}
+
+.wave:nth-child(1) { animation-delay: 0s; }
+.wave:nth-child(2) { animation-delay: 0.15s; }
+.wave:nth-child(3) { animation-delay: 0.3s; }
+.wave:nth-child(4) { animation-delay: 0.45s; }
+.wave:nth-child(5) { animation-delay: 0.6s; }
+
+@keyframes waveAnim {
+  0%, 100% {
+    height: 20%;
+    opacity: 0.3;
+  }
+  50% {
+    height: 100%;
+    opacity: 1;
+  }
+}
+
+</style>
