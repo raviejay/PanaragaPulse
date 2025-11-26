@@ -22,22 +22,19 @@ const userProfile = ref(null);
 // Manual QR input
 const manualQRCode = ref('');
 
-// Camera QR scanning
+// Camera QR scanning - UPDATED TO MATCH FIRST COMPONENT
 const showCameraModal = ref(false);
 const qrScanner = ref(null);
 const cameraError = ref('');
 const scanning = ref(false);
-const cameraLoading = ref(false);
-const processingQR = ref(false); // Changed from processingScan to processingQR for consistency
+const processingQR = ref(false);
 
-// Start camera for QR scanning with auto-detection
+// Start camera for QR scanning with auto-detection - UPDATED TO MATCH FIRST COMPONENT
 const startCamera = async () => {
   try {
     cameraError.value = '';
-    cameraLoading.value = true;
     showCameraModal.value = true;
-    scanning.value = false;
-    processingQR.value = false;
+    scanning.value = true;
     
     // Wait for next tick to ensure video element is rendered
     await new Promise(resolve => setTimeout(resolve, 100));
@@ -45,11 +42,10 @@ const startCamera = async () => {
     
     if (!videoElement) {
       cameraError.value = 'Camera element not found';
-      cameraLoading.value = false;
       return;
     }
 
-    // Initialize QR Scanner
+    // Initialize QR Scanner - USING SAME CONFIG AS FIRST COMPONENT
     qrScanner.value = new QrScanner(
       videoElement,
       async result => {
@@ -78,18 +74,15 @@ const startCamera = async () => {
     );
 
     await qrScanner.value.start();
-    scanning.value = true;
     
   } catch (err) {
     cameraError.value = 'Camera access denied or not available. Please use manual input instead.';
     console.error('Camera error:', err);
     scanning.value = false;
-  } finally {
-    cameraLoading.value = false;
   }
 };
 
-// Stop camera
+// Stop camera - UPDATED TO MATCH FIRST COMPONENT
 const stopCamera = () => {
   if (qrScanner.value) {
     qrScanner.value.stop();
@@ -126,7 +119,7 @@ const fetchUserProfile = async () => {
   }
 };
 
-// Scan QR Code
+// Scan QR Code - UPDATED processingQR handling
 const scanQRCode = async () => {
   try {
     loading.value = true;
@@ -355,15 +348,35 @@ const resetForm = () => {
       </div>
 
       <div class="max-w-md mx-auto space-y-4">
-        <!-- Camera Scan Button -->
+        <!-- Camera Scan Button - UPDATED TO MATCH FIRST COMPONENT -->
         <button
           @click="startCamera"
-          :disabled="cameraLoading"
-          class="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-6 py-4 rounded-lg font-medium transition flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          class="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-6 py-4 rounded-lg font-medium transition flex items-center justify-center space-x-2"
         >
-          <span v-if="cameraLoading" class="animate-spin">⏳</span>
-          <span v-else class="text-2xl">📸</span>
-          <span>{{ cameraLoading ? 'Starting Camera...' : 'Scan with Camera' }}</span>
+          <span class="text-2xl">📸</span>
+          <span>Scan with Camera</span>
+        </button>
+        
+        <!-- Manual Input Option -->
+        <div class="text-center text-gray-500">or</div>
+        
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Enter QR Code Manually</label>
+          <input
+            v-model="manualQRCode"
+            type="text"
+            placeholder="e.g., CORAL-1234567890-ABC123"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent outline-none"
+            @keyup.enter="scanQRCode"
+          />
+        </div>
+        
+        <button
+          @click="scanQRCode"
+          :disabled="loading"
+          class="w-full bg-cyan-500 hover:bg-cyan-600 text-white px-6 py-3 rounded-lg font-medium transition disabled:opacity-50"
+        >
+          {{ loading ? 'Searching...' : 'Find Location' }}
         </button>
       </div>
     </div>
@@ -516,7 +529,7 @@ const resetForm = () => {
       </div>
     </div>
 
-    <!-- Camera QR Scanner Modal -->
+    <!-- Camera QR Scanner Modal - UPDATED TO MATCH FIRST COMPONENT -->
     <div
       v-if="showCameraModal"
       class="fixed inset-0 backdrop-blur-md bg-black/40 flex items-center justify-center p-4 z-50"
@@ -540,6 +553,20 @@ const resetForm = () => {
         <div class="space-y-4">
           <!-- Camera Preview -->
           <div class="relative bg-gray-900 rounded-lg overflow-hidden" style="aspect-ratio: 4/3;">
+            <video
+              id="qr-video"
+              class="w-full h-full object-cover"
+            ></video>
+            
+            <!-- Scanning Indicator -->
+            <div
+              v-if="scanning"
+              class="absolute top-2 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-2 py-1 rounded-full text-xs font-medium flex items-center space-x-2 whitespace-nowrap"
+            >
+              <div class="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+              <span>Scanning for QR codes...</span>
+            </div>
+            
             <!-- Processing QR Code Indicator -->
             <div
               v-if="processingQR"
@@ -551,48 +578,14 @@ const resetForm = () => {
                 <p class="text-gray-600 text-sm mt-1">Fetching coral information</p>
               </div>
             </div>
-
-            <!-- Loading State -->
-            <div v-else-if="cameraLoading" class="absolute inset-0 flex items-center justify-center bg-gray-900">
-              <div class="text-center text-white">
-                <div class="animate-spin text-4xl mb-4">⏳</div>
-                <p class="text-lg font-medium">Starting camera...</p>
-                <p class="text-gray-300 text-sm mt-2">Please allow camera access if prompted</p>
-              </div>
-            </div>
-
-            <!-- Camera Feed -->
-            <video
-              v-else
-              id="qr-video"
-              class="w-full h-full object-cover"
-            ></video>
-            
-            <!-- Scanning Indicator -->
-            <div
-              v-if="scanning && !cameraLoading && !processingQR"
-              class="absolute top-2 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-3 py-2 rounded-full text-sm font-medium flex items-center space-x-2 whitespace-nowrap shadow-lg"
-            >
-              <div class="w-2 h-2 bg-white rounded-full animate-pulse"></div>
-              <span>Scanning for QR codes...</span>
-            </div>
-
-            <!-- No Camera Access State -->
-            <div v-if="cameraError && !cameraLoading && !processingQR" class="absolute inset-0 flex items-center justify-center bg-gray-900">
-              <div class="text-center text-white p-4">
-                <div class="text-4xl mb-4">📵</div>
-                <p class="text-lg font-medium mb-2">Camera Not Available</p>
-                <p class="text-gray-300">{{ cameraError }}</p>
-              </div>
-            </div>
           </div>
 
-          <p v-if="!cameraError && !processingQR" class="text-center text-gray-600">
-            {{ cameraLoading ? 'Initializing camera...' : 'Position the QR code within the frame - it will scan automatically!' }}
+          <p class="text-center text-gray-600">
+            Position the QR code within the frame - it will scan automatically!
           </p>
 
           <!-- Instructions -->
-          <div v-if="!cameraLoading && !cameraError && !processingQR" class="bg-cyan-50 border border-cyan-200 rounded-lg p-4">
+          <div class="bg-cyan-50 border border-cyan-200 rounded-lg p-4">
             <p class="text-sm text-cyan-800">
               <span class="font-semibold">📌 Tips:</span> 
               <br>• Keep the QR code steady within the frame
@@ -602,7 +595,7 @@ const resetForm = () => {
           </div>
 
           <!-- Manual Input (shown in modal) -->
-          <div v-if="!cameraLoading && !processingQR">
+          <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">Or Enter Code Manually</label>
             <div class="flex space-x-2">
               <input
@@ -615,7 +608,7 @@ const resetForm = () => {
               />
               <button
                 @click="async () => { await scanQRCode(); stopCamera(); }"
-                :disabled="loading || !manualQRCode.trim() || processingQR"
+                :disabled="loading || processingQR"
                 class="bg-cyan-500 hover:bg-cyan-600 text-white px-6 py-3 rounded-lg font-medium transition disabled:opacity-50 disabled:cursor-not-allowed min-w-[80px]"
               >
                 {{ loading || processingQR ? '...' : 'Go' }}
@@ -624,7 +617,6 @@ const resetForm = () => {
           </div>
 
           <button
-            v-if="!processingQR"
             @click="stopCamera"
             class="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-3 rounded-lg font-medium transition"
           >
