@@ -95,5 +95,33 @@ router.onError((error) => {
 router.afterEach((to, from) => {
   console.log(`[Router] Completed: ${to.path}`);
 });
+router.beforeEach(async (to, from, next) => {
+  const { data: { session } } = await supabase.auth.getSession();
+  const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
+
+  if (requiresAuth && !session) {
+    // Not logged in, redirect to login
+    next('/login');
+  } else if (to.path === '/login' && session) {
+    // Already logged in, redirect to dashboard
+    next('/dashboard');
+  } else if (to.meta.role && session) {
+    // Check role-based access
+    const { data: profile } = await supabase
+      .from('users')
+      .select('role')
+      .eq('id', session.user.id)
+      .single();
+
+    if (profile && profile.role === to.meta.role) {
+      next();
+    } else {
+      // Wrong role, redirect to dashboard
+      next('/dashboard');
+    }
+  } else {
+    next();
+  }
+});
 
 export default router;
