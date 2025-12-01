@@ -42,6 +42,18 @@ const router = useRouter();
       
       <!-- Admin Dashboard -->
       <template v-if="userProfile?.role === 'admin'">
+
+        <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition">
+          <div class="text-4xl mb-4">📚</div>
+          <h3 class="text-xl font-bold text-gray-800 mb-2">IEC Management</h3>
+          <p class="text-gray-600 mb-4">Manage educational content</p>
+          <button 
+            @click="router.push('/admin/iec-management')"
+            class="bg-cyan-500 hover:bg-cyan-600 text-white px-4 py-2 rounded-lg w-full">
+            Manage IEC
+          </button>
+        </div>
+
         <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition">
           <div class="text-4xl mb-4">🎁</div>
           <h3 class="text-xl font-bold text-gray-800 mb-2">Rewards Management</h3>
@@ -88,11 +100,9 @@ const router = useRouter();
           <div class="text-4xl mb-4">👥</div>
           <h3 class="text-xl font-bold text-gray-800 mb-2">User Management</h3>
           <p class="text-gray-600 mb-4">Manage rangers and tourists</p>
-         <button 
-          @click="router.push('/admin/user-management')"
-          class="bg-cyan-500 hover:bg-cyan-600 text-white px-4 py-2 rounded-lg w-full">
-          Manage Users
-        </button>
+          <button class="bg-cyan-500 hover:bg-cyan-600 text-white px-4 py-2 rounded-lg w-full">
+            Manage Users
+          </button>
         </div>
       </template>
 
@@ -141,6 +151,17 @@ const router = useRouter();
 
       <!-- Tourist Dashboard -->
       <template v-else>
+         <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition">
+          <div class="text-4xl mb-4">📚</div>
+          <h3 class="text-xl font-bold text-gray-800 mb-2">IEC Library</h3>
+          <p class="text-gray-600 mb-4">Learn about coral conservation</p>
+          <button 
+            @click="router.push('/tourist/iec')"
+            class="bg-cyan-500 hover:bg-cyan-600 text-white px-4 py-2 rounded-lg w-full">
+            Browse Content
+          </button>
+        </div>
+
         <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition">
           <div class="text-4xl mb-4">📱</div>
           <h3 class="text-xl font-bold text-gray-800 mb-2">Scan QR Code</h3>
