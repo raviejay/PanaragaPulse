@@ -15,6 +15,9 @@ import RewardsShop from "../views/RewardsShop.vue";
 import AdminRewardsManagement from "../views/RewardsManagement.vue";
 import EventParticipants from "@/views/EventParticipants.vue";
 import UserManagement from "../views/UserManagement.vue";
+import IECLibrary from "../views/IECLibrary.vue";
+import IECManagement from "../views/IECManagement.vue";
+
 
 const routes = [
   {
@@ -100,6 +103,18 @@ const routes = [
     path: "/admin/user-management",
     name: "UserManagement",
     component: UserManagement,
+    meta: { requiresAuth: true, role: "admin" },
+  },
+  {
+    path: "/tourist/iec",
+    name: "IECLibrary",
+    component: IECLibrary,
+    meta: { requiresAuth: true, role: "tourist" },
+  },
+  {
+    path: "/admin/iec-management",
+    name: "IECManagement",
+    component: IECManagement,
     meta: { requiresAuth: true, role: "admin" },
   }
 
