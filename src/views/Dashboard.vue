@@ -154,23 +154,23 @@ const router = useRouter();
           </button>
         </div>
 
-        <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition">
+        <!-- <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition">
           <div class="text-4xl mb-4">🪸</div>
           <h3 class="text-xl font-bold text-gray-800 mb-2">Coral Monitoring</h3>
           <p class="text-gray-600 mb-4">View and manage coral data</p>
           <button class="bg-cyan-500 hover:bg-cyan-600 text-white px-4 py-2 rounded-lg w-full">
             View Corals
           </button>
-        </div>
+        </div> -->
 
-        <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition">
+        <!-- <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition">
           <div class="text-4xl mb-4">✅</div>
           <h3 class="text-xl font-bold text-gray-800 mb-2">Verify Actions</h3>
           <p class="text-gray-600 mb-4">Review tourist eco-actions</p>
           <button class="bg-cyan-500 hover:bg-cyan-600 text-white px-4 py-2 rounded-lg w-full">
             Review Submissions
           </button>
-        </div>
+        </div> -->
       </template>
 
       <!-- Tourist Dashboard -->
@@ -208,14 +208,14 @@ const router = useRouter();
           </button>
         </div>
 
-        <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition">
+        <!-- <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition">
           <div class="text-4xl mb-4">🌿</div>
           <h3 class="text-xl font-bold text-gray-800 mb-2">Do Eco-Actions</h3>
           <p class="text-gray-600 mb-4">Complete tasks and earn points</p>
           <button class="bg-cyan-500 hover:bg-cyan-600 text-white px-4 py-2 rounded-lg w-full">
             View Actions
           </button>
-        </div>
+        </div> -->
 
         <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition">
           <div class="text-4xl mb-4">🎁</div>
