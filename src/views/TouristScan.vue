@@ -372,7 +372,7 @@ const resetForm = () => {
           <!-- Seagrass Status -->
           <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
             <div>
-              <p class="text-sm text-gray-600">Seagrass Status</p>
+              <p class="text-sm text-gray-600">Status</p>
               <p class="text-lg font-bold text-gray-800">🌿 {{ coralInfo.seagrass_status }}</p>
             </div>
           </div>
