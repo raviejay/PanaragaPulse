@@ -312,27 +312,6 @@ const resetForm = () => {
           <span>Scan with Camera</span>
         </button>
         
-        <!-- <div class="text-center text-gray-500">or</div>
-        
-       
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Enter QR Code Manually</label>
-          <input
-            v-model="manualQRCode"
-            type="text"
-            placeholder="e.g., CORAL-1234567890-ABC123"
-            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent outline-none"
-            @keyup.enter="scanQRCode"
-          />
-        </div>
-        
-        <button
-          @click="scanQRCode"
-          :disabled="loading"
-          class="w-full bg-cyan-500 hover:bg-cyan-600 text-white px-6 py-3 rounded-lg font-medium transition disabled:opacity-50"
-        >
-          {{ loading ? 'Searching...' : 'Find Location' }}
-        </button> -->
       </div>
     </div>
 

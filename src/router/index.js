@@ -17,6 +17,8 @@ import EventParticipants from "@/views/EventParticipants.vue";
 import UserManagement from "../views/UserManagement.vue";
 import IECLibrary from "../views/IECLibrary.vue";
 import IECManagement from "../views/IECManagement.vue";
+import ReefReportsManagement from "../views/ReefReportsManagement.vue";
+import MPAComplianceReports from "../views/MPAComplianceReports.vue";
 
 
 const routes = [
@@ -78,14 +80,13 @@ const routes = [
     component: EventScanner,
     meta: { requiresAuth: true, role: "ranger" },
   },
- 
+
   {
     path: "/tourist/rewards",
     name: "TouristRewards",
     component: RewardsShop,
     meta: { requiresAuth: true, role: "tourist" },
   },
-
 
   {
     path: "/admin/rewards",
@@ -116,8 +117,19 @@ const routes = [
     name: "IECManagement",
     component: IECManagement,
     meta: { requiresAuth: true, role: "admin" },
-  }
-
+  },
+  {
+    path: "/reef-reports",
+    name: "ReefReports",
+    component: ReefReportsManagement,
+    meta: { requiresAuth: true, requiresRole: "admin" },
+  },
+  {
+    path: "/mpa-reports",
+    name: "MPAReports",
+    component: MPAComplianceReports,
+    meta: { requiresAuth: true, requiresRole: "admin" },
+  },
 ];
 
 const router = createRouter({

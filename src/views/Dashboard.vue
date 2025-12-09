@@ -43,6 +43,30 @@ const router = useRouter();
       <!-- Admin Dashboard -->
       <template v-if="userProfile?.role === 'admin'">
 
+        <!-- NEW: Premium Reports Section -->
+        <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition">
+          <div class="text-4xl mb-4">📊</div>
+          <h3 class="text-xl font-bold mb-2">Reef Status Reports</h3>
+          <p class="text-gray-600 mb-4">Generate automated reef condition reports</p>
+          <button 
+            @click="router.push('/reef-reports')"
+            class="bg-cyan-500 hover:bg-cyan-600 text-white px-4 py-2 rounded-lg w-full">
+            Generate Reports
+          </button>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition">
+          <div class="text-4xl mb-4">📋</div>
+          <h3 class="text-xl font-bold mb-2">MPA Compliance</h3>
+          <p class="text-gray-600 mb-4">DENR & BFAR compliance reports</p>
+          <button 
+            @click="router.push('/mpa-reports')"
+            class="bg-cyan-500 hover:bg-cyan-600 text-white px-4 py-2 rounded-lg w-full">
+            MPA Reports
+          </button>
+        </div>
+
+        <!-- Existing Admin Features -->
         <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition">
           <div class="text-4xl mb-4">📚</div>
           <h3 class="text-xl font-bold text-gray-800 mb-2">IEC Management</h3>
@@ -100,7 +124,7 @@ const router = useRouter();
           <div class="text-4xl mb-4">👥</div>
           <h3 class="text-xl font-bold text-gray-800 mb-2">User Management</h3>
           <p class="text-gray-600 mb-4">Manage rangers and tourists</p>
-          <button class="bg-cyan-500 hover:bg-cyan-600 text-white px-4 py-2 rounded-lg w-full">
+          <button @click="router.push('/admin/user-management')" class="bg-cyan-500 hover:bg-cyan-600 text-white px-4 py-2 rounded-lg w-full">
             Manage Users
           </button>
         </div>
